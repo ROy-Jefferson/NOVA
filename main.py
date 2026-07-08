@@ -8,14 +8,46 @@ class Nova:
 
     def chat(self, user_input):
 
-        # 🧠 PDF TOOL
+        # 📄 PDF TOOL
         if user_input.startswith("pdf "):
-           file_path = user_input.replace("pdf ", "").strip()
-           document, summary = summarize_pdf(file_path)
-           self.current_document = document
-           return summary
+            file_path = user_input.replace("pdf ", "").strip()
 
-        # 💬 OLLAMA AI
+            document, summary = summarize_pdf(file_path)
+
+            self.current_document = document
+
+            return summary
+
+        # 🧠 DOCUMENT MEMORY
+        if self.current_document:
+
+            prompt = f"""
+You are NOVA.
+
+The user has already loaded the following document.
+
+-------------------------
+{self.current_document}
+-------------------------
+
+Answer the user's question using ONLY the information in the document.
+
+User's question:
+{user_input}
+"""
+
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama3.1",
+                    "prompt": prompt,
+                    "stream": False
+                }
+            )
+
+            return response.json()["response"]
+
+        # 💬 NORMAL CHAT
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
