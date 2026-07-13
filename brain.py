@@ -2,13 +2,20 @@ import requests
 
 
 class Brain:
+    """
+    Handles all communication with the AI model (Ollama).
+    """
+
+    def __init__(self):
+        self.model = "llama3.1"
+        self.url = "http://localhost:11434/api/generate"
 
     def ask(self, prompt):
 
         response = requests.post(
-            "http://localhost:11434/api/generate",
+            self.url,
             json={
-                "model": "llama3.1",
+                "model": self.model,
                 "prompt": prompt,
                 "stream": False
             }
